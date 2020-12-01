@@ -1,0 +1,7 @@
+for claim of claims {
+  from claim.top to claim.height in claims (y) {
+    from claim.left to claim.width in claim (x) {
+      claims[y][x] +=1
+    }
+  }
+}

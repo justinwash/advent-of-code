@@ -7,7 +7,7 @@ use std::{
     path::Path,
 };
 
-fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
+fn _lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     let file = File::open(filename).expect("no such file");
     let buf = BufReader::new(file);
     buf.lines()
@@ -15,7 +15,7 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
         .collect()
 }
 
-fn ints_from_lines(lines: Vec<String>) -> Vec<i32> {
+fn _ints_from_lines(lines: Vec<String>) -> Vec<i32> {
     let ints = lines.into_iter().map(|line| line.parse().unwrap());
     ints.collect()
 }

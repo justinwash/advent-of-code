@@ -30,15 +30,17 @@ fn part_one() {
   let mut result: i32 = -1;
 
   for i in 0..input_as_ints.len() {
-    if result != -1 { break; }
+    if result != -1 {
+      break;
+    }
     for j in 0..input_as_ints.len() {
-        if input_as_ints[i] == input_as_ints[j] {
-        } else if input_as_ints[i] + input_as_ints[j] == 2020 {
-          result = input_as_ints[i] * input_as_ints[j];
-          break;
-        }
+      if input_as_ints[i] == input_as_ints[j] {
+      } else if input_as_ints[i] + input_as_ints[j] == 2020 {
+        result = input_as_ints[i] * input_as_ints[j];
+        break;
       }
     }
+  }
 
   //println!("part 1 result: {}", result);
 }
@@ -52,9 +54,13 @@ fn part_two() {
   let mut result: i32 = -1;
 
   for i in 0..input_as_ints.len() {
-    if result != -1 { break; }
+    if result != -1 {
+      break;
+    }
     for j in 0..input_as_ints.len() {
-      if result != -1 { break; }
+      if result != -1 {
+        break;
+      }
       for k in 0..input_as_ints.len() {
         if input_as_ints[i] == input_as_ints[j]
           || input_as_ints[i] == input_as_ints[k]

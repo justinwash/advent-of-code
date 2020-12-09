@@ -214,7 +214,14 @@ fn part_two() {
                 false
             };
 
-            if !digits_invalid || !phgt_invalid {
+            let hcl_invalid: bool = {
+                let hcl = entries[i].hcl.split("#").nth(1);
+                !hcl.is_some()
+                    || (hcl.is_some()
+                        && hcl.unwrap().len() != 6
+                        && hex::decode(hcl.unwrap()).is_err())
+            };
+            if !digits_invalid || !phgt_invalid || !hcl_invalid {
                 result += 1;
             }
         }

@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate measure_time;
+extern crate lazy_static;
 
+use regex::Regex;
 use std::{
     fs::File,
     io::{prelude::*, BufReader},
@@ -175,59 +177,97 @@ fn part_two() {
 
     let mut result = 0;
     for i in 0..entries.len() {
-        if entries[i].byr == ""
-            || entries[i].iyr == ""
-            || entries[i].eyr == ""
-            || entries[i].hgt == ""
-            || entries[i].hcl == ""
-            || entries[i].ecl == ""
-            || entries[i].pid == ""
+        if entries[i].byr != ""
+            || entries[i].iyr != ""
+            || entries[i].eyr != ""
+            || entries[i].hgt != ""
+            || entries[i].hcl != ""
+            || entries[i].ecl != ""
+            || entries[i].pid != ""
         {
-        } else {
-            let digits_invalid = true
-                && ((entries[i].byr).parse::<i32>().unwrap() < 1920
-                    || (entries[i].byr).parse::<i32>().unwrap() > 2002)
-                || ((entries[i].iyr).parse::<i32>().unwrap() < 2010
-                    || (entries[i].iyr).parse::<i32>().unwrap() > 2020)
-                || ((entries[i].eyr).parse::<i32>().unwrap() < 2020
-                    || (entries[i].eyr).parse::<i32>().unwrap() > 2030);
-
-            let phgt_invalid: bool = if entries[i].hgt.contains("cm") {
-                let cm_hgt = entries[i]
-                    .hgt
-                    .split("cm")
-                    .nth(0)
-                    .unwrap()
-                    .parse::<i32>()
-                    .unwrap();
-                cm_hgt < 150 || cm_hgt > 193
-            } else if entries[i].hgt.contains("in") {
-                let in_hgt = entries[i]
-                    .hgt
-                    .split("in")
-                    .nth(0)
-                    .unwrap()
-                    .parse::<i32>()
-                    .unwrap();
-                in_hgt < 59 || in_hgt > 76
-            } else {
-                false
-            };
-
-            let hcl_invalid: bool = {
-                let hcl = entries[i].hcl.split("#").nth(1);
-                !hcl.is_some()
-                    || (hcl.is_some()
-                        && hcl.unwrap().len() != 6
-                        && hex::decode(hcl.unwrap()).is_err())
-            };
-            if !digits_invalid || !phgt_invalid || !hcl_invalid {
-                result += 1;
+            if validate_byr(&entries[i].byr)
+                && validate_iyr(&entries[i].iyr)
+                && validate_eyr(&entries[i].eyr)
+                && validate_hgt(&entries[i].hgt)
+                && validate_hcl(&entries[i].hcl)
+                && validate_ecl(&entries[i].ecl)
+                && validate_pid(&entries[i].pid)
+            {
+                result += 1
             }
         }
     }
 
     println!("part 2 result: {}", result)
+}
+
+fn validate_yr(year: &String, min_year: u32, max_year: u32) -> bool {
+    lazy_static::lazy_static! {
+        static ref YR_REGEX: Regex = Regex::new(r"^(?x)\d{4}$").unwrap();
+    }
+
+    if YR_REGEX.is_match(&year) {
+        let year = year.parse::<u32>().unwrap();
+        return (min_year..=max_year).contains(&year);
+    } else {
+        return false;
+    }
+}
+
+fn validate_byr(byr: &String) -> bool {
+    validate_yr(byr, 1920, 2002)
+}
+
+fn validate_iyr(iyr: &String) -> bool {
+    validate_yr(iyr, 2010, 2020)
+}
+
+fn validate_eyr(eyr: &String) -> bool {
+    validate_yr(eyr, 2020, 2030)
+}
+
+fn validate_hgt(hgt: &String) -> bool {
+    lazy_static::lazy_static! {
+        static ref HGT_REGEX: Regex = Regex::new(r"^\d*(cm|in)$").unwrap();
+    }
+
+    let v_height = if HGT_REGEX.is_match(hgt) {
+        let height = hgt[0..hgt.len() - 2].parse::<i32>().unwrap();
+
+        match &hgt[hgt.len() - 2..hgt.len()] {
+            "cm" => (150..=193).contains(&height),
+            "in" => (59..=76).contains(&height),
+            _ => unreachable!(),
+        }
+    } else {
+        false
+    };
+
+    v_height
+}
+
+fn validate_hcl(hcl: &String) -> bool {
+    lazy_static::lazy_static! {
+        static ref HCL_REGEX: Regex = Regex::new(r"^#(\d|[a-f]){6}$").unwrap();
+    }
+
+    HCL_REGEX.is_match(hcl)
+}
+
+fn validate_ecl(ecl: &String) -> bool {
+    lazy_static::lazy_static! {
+        static ref ECL_REGEX: Regex = Regex::new(r"^amb|blu|brn|gry|grn|hzl|oth$").unwrap();
+    }
+
+    ECL_REGEX.is_match(ecl)
+}
+
+fn validate_pid(pid: &String) -> bool {
+    lazy_static::lazy_static! {
+        static ref PID_REGEX: Regex = Regex::new(r"^\d{9}$").unwrap();
+    }
+
+    PID_REGEX.is_match(pid)
 }
 
 fn main() {

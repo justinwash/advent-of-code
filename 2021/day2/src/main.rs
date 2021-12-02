@@ -16,69 +16,68 @@ fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
     .collect()
 }
 
-fn ints_from_lines(lines: Vec<String>) -> Vec<i32> {
-  let ints = lines.into_iter().map(|line| line.parse().unwrap());
-  ints.collect()
+fn instructions_from_lines(lines: &Vec<String>) -> Vec<(String, i32)> {
+  let instructions = lines.into_iter().map(|line| {
+    let direction_amount: Vec<&str> = line.split(" ").collect();
+    (
+      String::from(direction_amount[0]),
+      direction_amount[1].parse().unwrap(),
+    )
+  });
+
+  instructions.collect()
 }
 
-fn part_one() {
+fn part_one(input: &Vec<String>) {
   print_time!("part 1");
 
-  let input = lines_from_file("input");
-  let input_as_ints = ints_from_lines(input);
+  let instructions = instructions_from_lines(input);
 
-  let mut result: i32 = -1;
+  let mut x_pos: i32 = 0;
+  let mut y_pos: i32 = 0;
 
-  for i in 0..input_as_ints.len() {
-    if result != -1 {
-      break;
-    }
-    for j in 0..input_as_ints.len() {
-      if input_as_ints[i] == input_as_ints[j] {
-      } else if input_as_ints[i] + input_as_ints[j] == 2020 {
-        result = input_as_ints[i] * input_as_ints[j];
-        break;
-      }
+  for instruction in 0..instructions.len() {
+    let (direction, amount) = &instructions[instruction];
+
+    match direction.as_str() {
+      "up" => y_pos -= amount,
+      "down" => y_pos += amount,
+      "forward" => x_pos += amount,
+      _ => panic!("Unknown direction"),
     }
   }
 
-  //println!("part 1 result: {}", result);
+  println!("part 1 result: {}", x_pos * y_pos);
 }
 
-fn part_two() {
+fn part_two(input: &Vec<String>) {
   print_time!("part 2");
 
-  let input = lines_from_file("input");
-  let input_as_ints = ints_from_lines(input);
+  let instructions = instructions_from_lines(input);
 
-  let mut result: i32 = -1;
+  let mut aim: i32 = 0;
+  let mut x_pos: i64 = 0;
+  let mut y_pos: i64 = 0;
 
-  for i in 0..input_as_ints.len() {
-    if result != -1 {
-      break;
-    }
-    for j in 0..input_as_ints.len() {
-      if result != -1 {
-        break;
+  for instruction in 0..instructions.len() {
+    let (direction, amount) = &instructions[instruction];
+
+    match direction.as_str() {
+      "up" => aim -= amount,
+      "down" => aim += amount,
+      "forward" => {
+        x_pos += *amount as i64;
+        y_pos += *amount as i64 * aim as i64;
       }
-      for k in 0..input_as_ints.len() {
-        if input_as_ints[i] == input_as_ints[j]
-          || input_as_ints[i] == input_as_ints[k]
-          || input_as_ints[j] == input_as_ints[k]
-        {
-        } else if input_as_ints[i] + input_as_ints[j] + input_as_ints[k] == 2020 {
-          result = input_as_ints[i] * input_as_ints[j] * input_as_ints[k];
-          break;
-        }
-      }
+      _ => panic!("Unknown direction"),
     }
   }
 
-  //println!("part 2 result: {}", result)
+  println!("part 2 result: {}", x_pos * y_pos);
 }
 
 fn main() {
-  part_one();
-
-  part_two();
+  let input = lines_from_file("input");
+  part_one(&input);
+  part_two(&input);
 }

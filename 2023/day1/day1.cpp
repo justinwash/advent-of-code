@@ -22,7 +22,7 @@ std::string extractNumerals(const std::string& input) {
       std::string currentWord;
 
       for (size_t j = i; j < input.size(); ++j) {
-        currentWord += std::tolower(input[j]);
+        currentWord += input[j];
 
         auto it = numericWords.find(currentWord);
         if (it != numericWords.end()) {
